@@ -7,7 +7,7 @@ use Silex\Application;
 class Authorize
 {
     // Connects the routes in Silex
-    static public function addRoutes($routing)
+    public static function addRoutes($routing)
     {
         $routing->get('/authorize', array(new self(), 'authorize'))->bind('authorize');
         $routing->post('/authorize', array(new self(), 'authorizeFormSubmit'))->bind('authorize_post');
@@ -30,7 +30,7 @@ class Authorize
             return $server->getResponse();
         }
 
-        // dispaly the "do you want to authorize?" form
+        // display the "do you want to authorize?" form
         return $app['twig']->render('server/authorize.twig', array(
             'client_id' => $app['request']->query->get('client_id'),
             'response_type' => $app['request']->query->get('response_type')

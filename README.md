@@ -17,13 +17,35 @@ Use [Composer](http://getcomposer.org/) to install this application:
     $ curl -s http://getcomposer.org/installer | php
     $ ./composer.phar install
 
-**WebHost Configuration**
+### WebHost Configuration
+
+#### Configure a Web Server
 
 Silex requires you to [configure your web server](http://silex.sensiolabs.org/doc/web_servers.html) to run it.
 
-**Permissions**
+Be sure to run the command `$ chmod -R 777 data/` in the project root so that the web server can create the sqlite file.
 
-Run the command `$ chmod -R 777 data/` in the project root so that the web server can create the sqlite file.
+#### Using PHP's built-in Web Server
+
+You can use php's *built-in web server*, however, you will need to spin up **two instances** and specify one of
+them in `data/parameters.json` in order to prevent the server from locking up. The client will issue a request
+to the server, and because PHP's built-in web server is single-threaded, this will result in deadlock.
+
+```
+$ cd oauth2-demo-php
+$ cp data/parameters.json.dist data/parameters.json
+$ sed -i '' 's?"grant"?"http://localhost:8081/lockdin/token"?g' data/parameters.json
+$ sed -i '' 's?"access"?"http://localhost:8081/lockdin/resource"?g' data/parameters.json
+```
+
+Now all you have to do is spin up two separate web servers in the `web` directory
+
+```
+$ cd web
+$ php -S localhost:8080 & php -S localhost:8081
+```
+
+Browse to `http://localhost:8080` in your browser and you're all set!
 
 What Does This App Do??
 -----------------------
@@ -97,7 +119,7 @@ you want to test against:
       "authorize_route": "https://myapp.com/authorize",
       "resource_route": "https://api.myapp.com/profile",
       "resource_method": "POST",
-      "resource_params": { "debug": true }
+      "resource_params": { "debug": true },
       "curl_options": { "http_port": 443, "verifyssl": false }
     }
 
